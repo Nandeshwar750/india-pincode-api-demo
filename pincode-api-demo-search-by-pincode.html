@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pincode Lookup Tool</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+        <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .hero-section {
+            background-color: #007bff;
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .content-sec {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+    </head>
+    <body>
+        <div class="hero-section">
+            <div class="container text-center">
+                <h2>API Endpoints Developed By NSK Multiservices</h2>
+                <h1>Post Office Lookup Tool - API Demo</h1>
+            </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="content-sec">
+                <h2 class="mb-4">Pincode Lookup</h2>
+
+                <div id="pincodeForm">
+                    <div class="mb-3">
+                        <label for="pincode" class="form-label">Enter 6 Digits
+                            Pincode:</label>
+                        <input type="text" class="form-control" id="pincode"
+                            placeholder="Enter 6-digit pincode" maxlength="6">
+                    </div>
+                    <button onclick="fetchData()"
+                        class="btn btn-primary">Search</button>
+                </div>
+
+                <div id="loading" class="mt-3 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <div id="error" class="mt-3 text-danger"></div>
+
+                <div id="results" class="mt-4">
+                    <h3>Post Offices:</h3>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Post Office Name</th>
+                                <th>Branch Type</th>
+                                <th>Delivery Status</th>
+                                <th>District</th>
+                                <th>State</th>
+                            </tr>
+                        </thead>
+                        <tbody id="postOfficesBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-sec">
+                <h2>About This Tool</h2>
+                <p>Pincode API Demo </p>
+                <p>This Post Office Lookup Tool allows you to find detailed
+                    information about post offices in India. Simply enter the
+                    state, district, and post office name to get comprehensive
+                    details including location, pincode, and more.</p>
+            </div>
+
+            <div class="content-sec">
+                <h3>Useful Links</h3>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Pincode API - Documentation</h5>
+                                <p class="card-text">To read more about Pincode API click on the button below.</p>
+                                <a href="https://pincodes.nskmultiservices.in/blog/pincode-api-documentation/210" class="btn btn-outline-primary">API Documentation</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Pincode API - Live Example</h5>
+                                <p class="card-text">Want to test live website that uses our API, click on the below button.</p>
+                                <a href="https://mostlyusedtools.com/tool/post-office-search-by-name" class="btn btn-outline-primary">Online Web Tools</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Pincode Database Prepared by - NSK Multiservices</h5>
+                                <p class="card-text">Visit for more services -</p>
+                                <a href="https://nskmultiservices.in" class="btn btn-outline-primary">NSK Multiservices</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        const apiBaseUrl = 'https://pincodes.nskmultiservices.in/api';
+        const pincodeInput = document.getElementById('pincode');
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+        const resultsElement = document.getElementById('results');
+        const postOfficesBody = document.getElementById('postOfficesBody');
+
+        pincodeInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+
+        pincodeInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                fetchData();
+            }
+        });
+
+        async function fetchData() {
+    const pincode = pincodeInput.value;
+    if (pincode.length !== 6) {
+        showError('Please enter a valid 6-digit pincode');
+        return;
+    }
+
+    showLoading(true);
+    clearError();
+    clearResults();
+
+    try {
+        const response = await fetch(`${apiBaseUrl}/pincode/${pincode}`, {
+            headers: {
+                'Authorization': 'Bearer 9|6QMxj7RaKKUb6IEvIJYT3JOmyZvwZgY837Y79XRP719be037'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('API request failed');
+        }
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            displayResults(result.data);
+        } else {
+            showError('No data found for the given pincode');
+        }
+    } catch (error) {
+        showError('An error occurred while fetching data');
+    } finally {
+        showLoading(false);
+    }
+}
+
+        function showLoading(show) {
+            loadingElement.classList.toggle('d-none', !show);
+        }
+
+        function showError(message) {
+            errorElement.textContent = message;
+        }
+
+        function clearError() {
+            errorElement.textContent = '';
+        }
+
+        function clearResults() {
+            postOfficesBody.innerHTML = '';
+            resultsElement.classList.add('d-none');
+        }
+
+        function displayResults(postOffices) {
+            resultsElement.classList.remove('d-none');
+            postOffices.forEach(office => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${office.postOfficeName}</td>
+                    <td>${office.branchType}</td>
+                    <td>${office.deliveryStatus}</td>
+                    <td>${office.districtName}</td>
+                    <td>${office.stateName}</td>
+                `;
+                postOfficesBody.appendChild(row);
+            });
+        }
+    </script>
+    </body>
+</html>
